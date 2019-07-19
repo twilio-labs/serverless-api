@@ -53,7 +53,7 @@ async function createAssetResource(
  * @param {GotClient} client API client
  * @returns {Promise<AssetApiResource[]>}
  */
-async function listAssetResources(serviceSid: string, client: GotClient) {
+export async function listAssetResources(serviceSid: string, client: GotClient) {
   try {
     const resp = await client.get(`/Services/${serviceSid}/Assets`);
     const content = (resp.body as unknown) as AssetList;
