@@ -129,25 +129,32 @@ async function createFunctionVersion(
 Please change it to have 'protected' access or deploy it as an asset.`);
   }
   try {
-    const contentType = getContentType(fn.content);
+    const contentType =
+      getContentType(fn.content, fn.filePath || 'application/json') ||
+      'application/javascript';
+    log('Uploading asset via form data with content-type "%s"', contentType);
+
+    const contentOpts = {
+      filename: fn.name,
+      contentType: contentType,
+    };
+
     const form = new FormData();
     form.append('path', fn.path);
     form.append('visibility', fn.access);
-    form.append('content', fn.content);
-    form.append('type', contentType);
+    form.append('content', fn.content, contentOpts);
 
     const resp = await client.post(
       `/Services/${serviceSid}/Functions/${fn.sid}/Versions`,
       {
         baseUrl: 'https://serverless-upload.twilio.com/v1',
-        headers: {
-          'Content-Type': contentType,
-        },
         body: form,
+        //@ts-ignore
+        json: false,
       }
     );
 
-    return (resp.body as unknown) as VersionResource;
+    return JSON.parse(resp.body) as VersionResource;
   } catch (err) {
     log('%O', err);
     throw new Error(`Failed to upload Function ${fn.name}`);

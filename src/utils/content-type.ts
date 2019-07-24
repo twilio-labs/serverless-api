@@ -10,7 +10,10 @@ import mime from 'mime-types';
  * @param {(string | Buffer)} content the content to check
  * @returns {(string | undefined)} a valid content type or undefined
  */
-export function getContentType(content: string | Buffer): string | undefined {
+export function getContentType(
+  content: string | Buffer,
+  name?: string
+): string | undefined {
   let contentType: string | undefined;
 
   if (typeof content !== 'string') {
@@ -21,7 +24,7 @@ export function getContentType(content: string | Buffer): string | undefined {
   }
 
   if (name && !contentType) {
-    contentType = mime.contentType(name) || undefined;
+    contentType = mime.lookup(name) || undefined;
   }
 
   return contentType;

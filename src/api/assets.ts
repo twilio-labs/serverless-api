@@ -131,25 +131,33 @@ async function createAssetVersion(
 Please change it to have "private" or "public" access.`);
   }
   try {
-    const contentType = getContentType(asset.content);
+    const contentType = getContentType(
+      asset.content,
+      asset.filePath || asset.name
+    );
+    log('Uploading asset via form data with content-type "%s"', contentType);
+
+    const contentOpts = {
+      filename: asset.name,
+      contentType: contentType,
+    };
+
     const form = new FormData();
     form.append('path', asset.path);
     form.append('visibility', asset.access);
-    form.append('content', asset.content);
-    form.append('type', contentType);
+    form.append('content', asset.content, contentOpts);
 
     const resp = await client.post(
       `/Services/${serviceSid}/Assets/${asset.sid}/Versions`,
       {
         baseUrl: 'https://serverless-upload.twilio.com/v1',
-        headers: {
-          'Content-Type': contentType,
-        },
         body: form,
+        //@ts-ignore
+        json: false,
       }
     );
 
-    return (resp.body as unknown) as VersionResource;
+    return JSON.parse(resp.body) as VersionResource;
   } catch (err) {
     log('%O', err);
     throw new Error('Failed to upload Asset');
