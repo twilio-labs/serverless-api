@@ -3,7 +3,7 @@
 const { promisfy } = require('util');
 
 import debug from 'debug';
-import { extname } from 'path';
+import FormData from 'form-data';
 import {
   AssetApiResource,
   AssetList,
@@ -13,7 +13,7 @@ import {
   Sid,
   VersionResource,
 } from '../types';
-import { uploadToAws } from '../utils/aws-upload';
+import { getContentType } from '../utils/content-type';
 
 const log = debug('twilio-serverless-api:assets');
 
@@ -126,15 +126,26 @@ async function createAssetVersion(
   serviceSid: string,
   client: GotClient
 ): Promise<VersionResource> {
+  if (asset.access === 'protected') {
+    throw new Error(`Asset ${asset.name} cannot be "protected".
+Please change it to have "private" or "public" access.`);
+  }
   try {
+    const contentType = getContentType(asset.content);
+    const form = new FormData();
+    form.append('path', asset.path);
+    form.append('visibility', asset.access);
+    form.append('content', asset.content);
+    form.append('type', contentType);
+
     const resp = await client.post(
       `/Services/${serviceSid}/Assets/${asset.sid}/Versions`,
       {
-        form: true,
-        body: {
-          Path: asset.path,
-          Visibility: asset.access,
+        baseUrl: 'https://serverless-upload.twilio.com/v1',
+        headers: {
+          'Content-Type': contentType,
         },
+        body: form,
       }
     );
 
@@ -160,12 +171,5 @@ export async function uploadAsset(
   client: GotClient
 ): Promise<Sid> {
   const version = await createAssetVersion(asset, serviceSid, client);
-  const { pre_signed_upload_url: awsData } = version;
-  const awsResult = await uploadToAws(
-    awsData.url,
-    awsData.kmsARN,
-    asset.content,
-    asset.name
-  );
   return version.sid;
 }

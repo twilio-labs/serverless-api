@@ -1,16 +1,17 @@
 /** @module @twilio-labs/serverless-api/dist/api */
 
 import debug from 'debug';
+import FormData from 'form-data';
 import {
   FunctionApiResource,
-  ServerlessResourceConfig,
   FunctionList,
   FunctionResource,
   GotClient,
+  ServerlessResourceConfig,
   Sid,
   VersionResource,
 } from '../types';
-import { uploadToAws } from '../utils/aws-upload';
+import { getContentType } from '../utils/content-type';
 
 const log = debug('twilio-serverless-api:functions');
 
@@ -128,14 +129,21 @@ async function createFunctionVersion(
 Please change it to have 'protected' access or deploy it as an asset.`);
   }
   try {
+    const contentType = getContentType(fn.content);
+    const form = new FormData();
+    form.append('path', fn.path);
+    form.append('visibility', fn.access);
+    form.append('content', fn.content);
+    form.append('type', contentType);
+
     const resp = await client.post(
       `/Services/${serviceSid}/Functions/${fn.sid}/Versions`,
       {
-        form: true,
-        body: {
-          Path: fn.path,
-          Visibility: fn.access,
+        baseUrl: 'https://serverless-upload.twilio.com/v1',
+        headers: {
+          'Content-Type': contentType,
         },
+        body: form,
       }
     );
 
@@ -161,12 +169,5 @@ export async function uploadFunction(
   client: GotClient
 ): Promise<Sid> {
   const version = await createFunctionVersion(fn, serviceSid, client);
-  const { pre_signed_upload_url: awsData } = version;
-  const awsResult = await uploadToAws(
-    awsData.url,
-    awsData.kmsARN,
-    fn.content,
-    fn.name
-  );
   return version.sid;
 }
