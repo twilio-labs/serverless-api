@@ -12,6 +12,7 @@ import {
   VersionResource,
 } from '../types';
 import { getContentType } from '../utils/content-type';
+import path from 'path';
 
 const log = debug('twilio-serverless-api:functions');
 
@@ -140,7 +141,7 @@ Please change it to have 'protected' access or deploy it as an asset.`);
     };
 
     const form = new FormData();
-    form.append('Path', fn.path);
+    form.append('Path', fn.path.replace(/\\/g, path.posix.sep));
     form.append('Visibility', fn.access);
     form.append('Content', fn.content, contentOpts);
 
