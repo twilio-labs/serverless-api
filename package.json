@@ -5,12 +5,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "run-s build:noemit",
+    "jest": "jest",
+    "test": "run-s build:noemit jest",
     "build": "tsc",
     "build:noemit": "tsc --noEmit",
     "postbuild": "npm shrinkwrap",
     "docs": "typedoc --options typedoc.json",
-    "postinstall": "node scripts/not-for-production-warning.js",
     "clean": "rimraf ./dist",
     "prepack": "run-s clean build",
     "lint-staged": "lint-staged",
@@ -33,6 +33,7 @@
   "license": "MIT",
   "files": [
     "dist/",
+    "!dist/**/__tests__/*",
     "README.md",
     "scripts/",
     "npm-shrinkwrap.json",
