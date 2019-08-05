@@ -41,11 +41,16 @@ export async function listLogResources(
 export async function listOnePageLogResources(
   environmentSid: Sid,
   serviceSid: Sid,
-  client: GotClient
+  client: GotClient,
+  pageSize: number = 50,
+  filterByFunctionSid?: string
 ) {
   try {
+    const functionFilter = filterByFunctionSid
+      ? `&FunctionSid=${filterByFunctionSid}`
+      : '';
     const resp = await client.get(
-      `/Services/${serviceSid}/Environments/${environmentSid}/Logs`
+      `/Services/${serviceSid}/Environments/${environmentSid}/Logs?PageSize=${pageSize}${functionFilter}`
     );
     const content = (resp.body as unknown) as LogList;
     return content.logs;

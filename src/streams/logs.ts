@@ -1,10 +1,10 @@
 import { Readable } from 'stream';
 import { listOnePageLogResources } from '../api/logs';
 import { LogApiResource, Sid, GotClient } from '../types';
-import { ClientConfig } from '../types/client';
 import { createGotClient } from '../client';
+import { LogsConfig } from '../types/logs';
 
-export class LogStream extends Readable {
+export class LogsStream extends Readable {
   _buffer: Array<LogApiResource>;
   _interval: NodeJS.Timeout | undefined;
   client: GotClient;
@@ -14,13 +14,13 @@ export class LogStream extends Readable {
   constructor(
     private environmentSid: Sid,
     private serviceSid: Sid,
-    clientConfig: ClientConfig
+    private config: LogsConfig
   ) {
     super({ objectMode: true });
     this._buffer = [];
     this._interval = undefined;
     this._viewedSids = new Set();
-    this.client = createGotClient(clientConfig);
+    this.client = createGotClient(config);
   }
 
   async _poll() {
@@ -28,7 +28,9 @@ export class LogStream extends Readable {
       const logs = await listOnePageLogResources(
         this.environmentSid,
         this.serviceSid,
-        this.client
+        this.client,
+        this.config.limit,
+        this.config.filterByFunction
       );
       logs
         .filter(log => !this._viewedSids.has(log.sid))
@@ -36,16 +38,21 @@ export class LogStream extends Readable {
           this._viewedSids.add(log.sid);
           this.push(JSON.stringify(log));
         });
+      if (!this.config.tail) {
+        this.push(null);
+      }
     } catch (err) {
       this.destroy(err);
     }
   }
 
   _read() {
-    if (!this._interval) {
+    if (this.config.tail && !this._interval) {
       this._interval = setInterval(() => {
         this._poll();
       }, this.pollingFrequency);
+    } else {
+      this._poll();
     }
   }
 
