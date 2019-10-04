@@ -58,7 +58,7 @@ const result = await client.deployLocalProject({
 
 ## API
 
-You can find the full reference documentation of everything at: https://serverless-api.twilio-labs.com
+You can find the full reference documentation of everything at: https://serverless-api.twilio-labs.com .
 
 Some functions you might want to check out is:
 
