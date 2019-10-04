@@ -121,7 +121,7 @@ Returns the internally used GotClient instance used to make API requests
 
 ### `client.list(listConfig: ListConfig): Promise<ListResult>`
 
-Returns an object containing lists of services, environments, variables functions or assets, depending on which have beeen requested in listConfig
+Returns an object containing lists of services, environments, variables functions or assets, depending on which have been requested in listConfig
 
 [More in the Docs](https://serverless-api.twilio-labs.com/classes/_twilio_labs_serverless_api.twilioserverlessapiclient.html#list)
 
