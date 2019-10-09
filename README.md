@@ -72,7 +72,7 @@ Some functions you might want to check out is:
 
 Deploys a local project by reading existing functions and assets from deployConfig.cwd and calling this.deployProject with it.
 
-Functions have to be placed in a functions or src directory to be found. Assets have to be placed into an assets or static directory.
+Functions have to be placed in a function or src directory to be found. Assets have to be placed into an asset or static directory.
 
 Nested folder structures will result in nested routes.
 
