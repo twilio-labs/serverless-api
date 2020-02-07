@@ -1,9 +1,9 @@
 /** @module @twilio-labs/serverless-api */
 
-import { ClientConfig } from './client';
 import { Sid } from './serverless-api';
+import { GotClient } from './generic';
 
-export type LogsConfig = ClientConfig & {
+export type LogsConfig = {
   serviceSid: Sid;
   environment: string | Sid;
   tail: boolean;

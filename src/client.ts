@@ -228,8 +228,12 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       }
       filterByFunction = foundFunction.sid;
     }
-
-    const logsStream = new LogsStream(environment, serviceSid, logsConfig);
+    const logsStream = new LogsStream(
+      environment,
+      serviceSid,
+      this.client,
+      logsConfig
+    );
 
     return logsStream;
   }

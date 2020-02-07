@@ -1,26 +1,24 @@
 import { Readable } from 'stream';
 import { listOnePageLogResources } from '../api/logs';
 import { LogApiResource, Sid, GotClient } from '../types';
-import { createGotClient } from '../client';
 import { LogsConfig } from '../types/logs';
 
 export class LogsStream extends Readable {
   _buffer: Array<LogApiResource>;
   _interval: NodeJS.Timeout | undefined;
-  client: GotClient;
   pollingFrequency = 1000;
   _viewedSids: Set<Sid>;
 
   constructor(
     private environmentSid: Sid,
     private serviceSid: Sid,
+    private client: GotClient,
     private config: LogsConfig
   ) {
     super({ objectMode: true });
     this._buffer = [];
     this._interval = undefined;
     this._viewedSids = new Set();
-    this.client = createGotClient(config);
   }
 
   async _poll() {
@@ -34,10 +32,16 @@ export class LogsStream extends Readable {
       );
       logs
         .filter(log => !this._viewedSids.has(log.sid))
+        .reverse()
         .forEach(log => {
-          this._viewedSids.add(log.sid);
           this.push(JSON.stringify(log));
         });
+      // Replace the set each time rather than adding to the set.
+      // This way the set is always the size of a page of logs and the next page
+      // will either overlap or not. This is instead of keeping an ever growing
+      // set of viewSids which would cause memory issues for long running log
+      // tails.
+      this._viewedSids = new Set(logs.map(log => log.sid));
       if (!this.config.tail) {
         this.push(null);
       }
