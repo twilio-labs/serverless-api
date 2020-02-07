@@ -43,15 +43,30 @@ export async function listOnePageLogResources(
   serviceSid: Sid,
   client: GotClient,
   pageSize: number = 50,
-  filterByFunctionSid?: string
+  functionSid?: string,
+  startDate?: string | Date,
+  endDate?: string | Date,
+  pageToken?: string
 ) {
   try {
-    const functionFilter = filterByFunctionSid
-      ? `&FunctionSid=${filterByFunctionSid}`
-      : '';
-    const resp = await client.get(
-      `/Services/${serviceSid}/Environments/${environmentSid}/Logs?PageSize=${pageSize}${functionFilter}`
-    );
+    let url = `/Services/${serviceSid}/Environments/${environmentSid}/Logs?PageSize=${pageSize}`;
+    if (typeof functionSid !== 'undefined') {
+      url += `&FunctionSid=${functionSid}`;
+    }
+    if (typeof startDate !== 'undefined') {
+      url += `&StartDate=${
+        startDate instanceof Date ? startDate.toISOString() : startDate
+      }`;
+    }
+    if (typeof endDate !== 'undefined') {
+      url += `&EndDate=${
+        endDate instanceof Date ? endDate.toISOString() : endDate
+      }`;
+    }
+    if (typeof pageToken !== 'undefined') {
+      url += `&PageToken=${pageToken}`;
+    }
+    const resp = await client.get(url);
     const content = (resp.body as unknown) as LogList;
     return content.logs;
   } catch (err) {
