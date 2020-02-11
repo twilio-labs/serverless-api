@@ -47,7 +47,7 @@ export async function listOnePageLogResources(
   startDate?: string | Date,
   endDate?: string | Date,
   pageToken?: string
-) {
+): Promise<LogApiResource[]> {
   try {
     let url = `/Services/${serviceSid}/Environments/${environmentSid}/Logs?PageSize=${pageSize}`;
     if (typeof functionSid !== 'undefined') {
@@ -68,7 +68,7 @@ export async function listOnePageLogResources(
     }
     const resp = await client.get(url);
     const content = (resp.body as unknown) as LogList;
-    return content.logs;
+    return content.logs as LogApiResource[];
   } catch (err) {
     log('%O', err);
     throw err;

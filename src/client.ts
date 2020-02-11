@@ -42,11 +42,13 @@ import {
   GotClient,
   ListConfig,
   ListResult,
+  LogApiResource,
 } from './types';
 import { DeployStatus } from './types/consts';
 import { getListOfFunctionsAndAssets, SearchConfig } from './utils/fs';
 import { LogsConfig } from './types/logs';
 import { LogsStream } from './streams/logs';
+import { listOnePageLogResources } from './api/logs';
 
 const log = debug('twilio-serverless-api:client');
 
@@ -236,6 +238,44 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     );
 
     return logsStream;
+  }
+
+  async getLogs(logsConfig: LogsConfig): Promise<LogApiResource[]> {
+    let { serviceSid, environment, filterByFunction } = logsConfig;
+    if (!isEnvironmentSid(environment)) {
+      const environmentResource = await getEnvironmentFromSuffix(
+        environment,
+        serviceSid,
+        this.client
+      );
+      environment = environmentResource.sid;
+    }
+
+    if (filterByFunction && !isFunctionSid(filterByFunction)) {
+      const availableFunctions = await listFunctionResources(
+        serviceSid,
+        this.client
+      );
+      const foundFunction = availableFunctions.find(
+        fn => fn.friendly_name === filterByFunction
+      );
+      if (!foundFunction) {
+        throw new Error('Invalid Function Name or SID');
+      }
+      filterByFunction = foundFunction.sid;
+    }
+
+    try {
+      return listOnePageLogResources(
+        environment,
+        serviceSid,
+        this.client,
+        50,
+        filterByFunction
+      );
+    } catch (e) {
+      throw e;
+    }
   }
 
   /**
