@@ -5,7 +5,6 @@ import { LogsConfig } from '../types/logs';
 
 export class LogsStream extends Readable {
   private _pollingFrequency: number;
-  private _buffer: Array<LogApiResource>;
   private _interval: NodeJS.Timeout | undefined;
   private _viewedSids: Set<Sid>;
 
@@ -16,7 +15,6 @@ export class LogsStream extends Readable {
     private config: LogsConfig
   ) {
     super({ objectMode: true });
-    this._buffer = [];
     this._interval = undefined;
     this._viewedSids = new Set();
     this._pollingFrequency = config.pollingFrequency || 1000;
