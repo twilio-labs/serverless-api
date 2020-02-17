@@ -27,8 +27,10 @@ export class LogsStream extends Readable {
         this.environmentSid,
         this.serviceSid,
         this.client,
-        this.config.limit,
-        this.config.filterByFunction
+        {
+          functionSid: this.config.filterByFunction,
+          pageSize: this.config.limit,
+        }
       );
       logs
         .filter(log => !this._viewedSids.has(log.sid))

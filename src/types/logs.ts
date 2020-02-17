@@ -9,3 +9,11 @@ export type LogsConfig = {
   limit?: number;
   filterByFunction?: string | Sid;
 };
+
+export type LogFilters = {
+  pageSize?: number;
+  functionSid?: Sid;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  pageToken?: string;
+};

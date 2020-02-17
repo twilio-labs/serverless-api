@@ -1,7 +1,7 @@
 /** @module @twilio-labs/serverless-api/dist/api */
 
 import debug from 'debug';
-import { GotClient, LogApiResource, LogList, Sid } from '../types';
+import { GotClient, LogApiResource, LogList, Sid, LogFilters } from '../types';
 import { getPaginatedResource } from './utils/pagination';
 
 const log = debug('twilio-serverless-api:logs');
@@ -42,12 +42,10 @@ export async function listOnePageLogResources(
   environmentSid: Sid,
   serviceSid: Sid,
   client: GotClient,
-  pageSize: number = 50,
-  functionSid?: string,
-  startDate?: string | Date,
-  endDate?: string | Date,
-  pageToken?: string
+  filters: LogFilters
 ): Promise<LogApiResource[]> {
+  const pageSize = filters.pageSize || 50;
+  const { functionSid, startDate, endDate, pageToken } = filters;
   try {
     let url = `/Services/${serviceSid}/Environments/${environmentSid}/Logs?PageSize=${pageSize}`;
     if (typeof functionSid !== 'undefined') {

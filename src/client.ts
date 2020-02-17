@@ -43,10 +43,10 @@ import {
   ListConfig,
   ListResult,
   LogApiResource,
+  LogsConfig,
 } from './types';
 import { DeployStatus } from './types/consts';
 import { getListOfFunctionsAndAssets, SearchConfig } from './utils/fs';
-import { LogsConfig } from './types/logs';
 import { LogsStream } from './streams/logs';
 import { listOnePageLogResources } from './api/logs';
 
@@ -266,13 +266,10 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     }
 
     try {
-      return listOnePageLogResources(
-        environment,
-        serviceSid,
-        this.client,
-        50,
-        filterByFunction
-      );
+      return listOnePageLogResources(environment, serviceSid, this.client, {
+        pageSize: 50,
+        functionSid: filterByFunction,
+      });
     } catch (e) {
       throw e;
     }
