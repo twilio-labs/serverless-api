@@ -47,7 +47,7 @@ export class LogsStream extends Readable {
         .filter(log => !this._viewedSids.has(log.sid))
         .reverse()
         .forEach(log => {
-          this.push(JSON.stringify(log));
+          this.push(log);
         });
       // Replace the set each time rather than adding to the set.
       // This way the set is always the size of a page of logs and the next page
