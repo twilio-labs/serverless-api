@@ -8,6 +8,7 @@ export type LogsConfig = {
   tail: boolean;
   limit?: number;
   filterByFunction?: string | Sid;
+  pollingFrequency?: number;
 };
 
 export type LogFilters = {
