@@ -17,7 +17,7 @@ function hasExtension(name: string | undefined): boolean {
  *
  * @export
  * @param {(string | Buffer)} content the content to check
- * @returns {(string | undefined)} a valid content type or undefined
+ * @returns {Promise<(string | undefined)>} a valid content type or undefined
  */
 export async function getContentType(
   content: string | Buffer,
