@@ -1,6 +1,5 @@
 import debug from 'debug';
-import { Options, OptionsOfJSONResponseBody } from 'got';
-import got from 'got';
+import { OptionsOfJSONResponseBody } from 'got';
 import { BaseList, GotClient } from '../../types';
 import { ClientApiError } from '../../utils/error';
 

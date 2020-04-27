@@ -1,7 +1,6 @@
 /** @module @twilio-labs/serverless-api/dist/api */
 
 import debug from 'debug';
-import querystring from 'querystring';
 import { JsonObject } from 'type-fest';
 import {
   BuildConfig,
@@ -11,11 +10,11 @@ import {
   GotClient,
 } from '../types';
 import { DeployStatus } from '../types/consts';
+import { ClientApiError } from '../utils/error';
 import { sleep } from '../utils/sleep';
 import { getPaginatedResource } from './utils/pagination';
 
 import events = require('events');
-import { ClientApiError } from '../utils/error';
 
 const log = debug('twilio-serverless-api:builds');
 
@@ -113,7 +112,7 @@ export async function triggerBuild(
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: querystring.stringify(body),
+      form: body,
     });
     return resp.body as BuildResource;
   } catch (err) {

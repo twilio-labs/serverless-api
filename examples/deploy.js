@@ -7,13 +7,19 @@ async function run() {
 
   const client = new TwilioServerlessApiClient(config);
   console.log('Deploying');
-  await client.deployProject({
+  const result = await client.deployProject({
     ...config,
     overrideExistingService: true,
     env: {
-      AHOY: 'world',
+      HELLO: 'ahoy',
+      WORLD: 'welt',
     },
-    pkgJson: {},
+    pkgJson: {
+      dependencies: {
+        'common-tags': '*',
+        'date-fns': '*',
+      },
+    },
     serviceName: 'api-demo',
     functionsEnv: 'test',
     functions: [
@@ -21,8 +27,12 @@ async function run() {
         name: 'hello-world',
         path: '/hello-world',
         content: `
+          const { stripIndent } = require('common-tags');
+          const { format } = require('date-fns');
           exports.handler = function(context, event, callback) {
-            callback(null, 'Ahoy: ' + context.AHOY);
+            callback(null, stripIndent\`
+              \${context.HELLO} \${context.WORLD} \${format(new Date(2010, 4, 10), 'yyyy-MM-dd')}
+            \`);
           };
         `,
         access: 'public',
@@ -38,6 +48,7 @@ async function run() {
     ],
   });
   console.log('Done Deploying');
+  console.dir(result);
 }
 
 run().catch(console.error);
