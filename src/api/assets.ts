@@ -1,18 +1,16 @@
 /** @module @twilio-labs/serverless-api/dist/api */
 
-const { promisfy } = require('util');
-
 import debug from 'debug';
 import FormData from 'form-data';
 import {
   AssetApiResource,
   AssetList,
   AssetResource,
-  GotClient,
   ServerlessResourceConfig,
   Sid,
   VersionResource,
 } from '../types';
+import { TwilioServerlessApiClient } from '../client';
 import { getContentType } from '../utils/content-type';
 import { ClientApiError } from '../utils/error';
 import { getApiUrl } from './utils/api-client';
@@ -25,16 +23,16 @@ const log = debug('twilio-serverless-api:assets');
  *
  * @param  {string} name friendly name of the resource
  * @param  {string} serviceSid service to register asset under
- * @param  {GotClient} client API client
+ * @param  {TwilioServerlessApiClient} client API client
  * @returns {Promise<AssetApiResource>}
  */
 async function createAssetResource(
   name: string,
   serviceSid: string,
-  client: GotClient
+  client: TwilioServerlessApiClient
 ): Promise<AssetApiResource> {
   try {
-    const resp = await client.post(`Services/${serviceSid}/Assets`, {
+    const resp = await client.request('post', `Services/${serviceSid}/Assets`, {
       form: {
         FriendlyName: name,
       },
@@ -50,12 +48,12 @@ async function createAssetResource(
  * Calls the API to retrieve a list of all assets
  *
  * @param {string} serviceSid service to look for assets
- * @param {GotClient} client API client
+ * @param {TwilioServerlessApiClient} client API client
  * @returns {Promise<AssetApiResource[]>}
  */
 export async function listAssetResources(
   serviceSid: string,
-  client: GotClient
+  client: TwilioServerlessApiClient
 ) {
   try {
     return getPaginatedResource<AssetList, AssetApiResource>(
@@ -73,13 +71,13 @@ export async function listAssetResources(
  *
  * @param  {FileInfo[]} assets
  * @param  {string} serviceSid
- * @param  {GotClient} client
+ * @param  {TwilioServerlessApiClient} client
  * @returns {Promise<AssetResource[]>}
  */
 export async function getOrCreateAssetResources(
   assets: ServerlessResourceConfig[],
   serviceSid: string,
-  client: GotClient
+  client: TwilioServerlessApiClient
 ): Promise<AssetResource[]> {
   const output: AssetResource[] = [];
   const existingAssets = await listAssetResources(serviceSid, client);
@@ -121,13 +119,13 @@ export async function getOrCreateAssetResources(
  *
  * @param  {AssetResource} asset the one to create a new version for
  * @param  {string} serviceSid the service to create the asset version for
- * @param  {GotClient} client API client
+ * @param  {TwilioServerlessApiClient} client API client
  * @returns {Promise<VersionResource>}
  */
 async function createAssetVersion(
   asset: AssetResource,
   serviceSid: string,
-  client: GotClient
+  client: TwilioServerlessApiClient
 ): Promise<VersionResource> {
   try {
     const contentType = await getContentType(
@@ -146,7 +144,8 @@ async function createAssetVersion(
     form.append('Visibility', asset.access);
     form.append('Content', asset.content, contentOpts);
 
-    const resp = await client.post(
+    const resp = await client.requestText(
+      'post',
       `Services/${serviceSid}/Assets/${asset.sid}/Versions`,
       {
         responseType: 'text',
@@ -168,13 +167,13 @@ async function createAssetVersion(
  * @export
  * @param {AssetResource} asset The asset to upload
  * @param {string} serviceSid The service to upload it to
- * @param {GotClient} client The API client
+ * @param {TwilioServerlessApiClient} client The API client
  * @returns {Promise<Sid>}
  */
 export async function uploadAsset(
   asset: AssetResource,
   serviceSid: string,
-  client: GotClient
+  client: TwilioServerlessApiClient
 ): Promise<Sid> {
   const version = await createAssetVersion(asset, serviceSid, client);
   return version.sid;

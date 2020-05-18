@@ -51,6 +51,11 @@ import {
 import { DeployStatus } from './types/consts';
 import { ClientApiError, convertApiErrorsAndThrow } from './utils/error';
 import { getListOfFunctionsAndAssets, SearchConfig } from './utils/fs';
+import {
+  HTTPAlias,
+  OptionsOfJSONResponseBody,
+  OptionsOfTextResponseBody,
+} from 'got/dist/source';
 
 const log = debug('twilio-serverless-api:client');
 
@@ -122,7 +127,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         types === 'services' ||
         (types.length === 1 && types[0] === 'services')
       ) {
-        const services = await listServices(this.client);
+        const services = await listServices(this);
         return { services };
       }
 
@@ -130,7 +135,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         typeof serviceSid === 'undefined' &&
         typeof serviceName !== 'undefined'
       ) {
-        serviceSid = await findServiceSid(serviceName, this.client);
+        serviceSid = await findServiceSid(serviceName, this);
       }
 
       if (typeof serviceSid === 'undefined') {
@@ -144,14 +149,11 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       for (const type of types) {
         try {
           if (type === 'environments') {
-            result.environments = await listEnvironments(
-              serviceSid,
-              this.client
-            );
+            result.environments = await listEnvironments(serviceSid, this);
           }
 
           if (type === 'builds') {
-            result.builds = await listBuilds(serviceSid, this.client);
+            result.builds = await listBuilds(serviceSid, this);
           }
 
           if (typeof environmentSid === 'string') {
@@ -159,7 +161,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
               const environment = await getEnvironmentFromSuffix(
                 environmentSid,
                 serviceSid,
-                this.client
+                this
               );
               environmentSid = environment.sid;
               currentBuildSidForEnv = environment.build_sid;
@@ -167,7 +169,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
               const environment = await getEnvironment(
                 environmentSid,
                 serviceSid,
-                this.client
+                this
               );
               currentBuildSidForEnv = environment.build_sid;
             }
@@ -177,7 +179,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
                 currentBuild = await getBuild(
                   currentBuildSidForEnv,
                   serviceSid,
-                  this.client
+                  this
                 );
               }
 
@@ -199,7 +201,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
                 entries: await listVariablesForEnvironment(
                   environmentSid,
                   serviceSid,
-                  this.client
+                  this
                 ),
                 environmentSid,
               };
@@ -223,7 +225,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         const environmentResource = await getEnvironmentFromSuffix(
           environment,
           serviceSid,
-          this.client
+          this
         );
         environment = environmentResource.sid;
       }
@@ -231,7 +233,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       if (filterByFunction && !isFunctionSid(filterByFunction)) {
         const availableFunctions = await listFunctionResources(
           serviceSid,
-          this.client
+          this
         );
         const foundFunction = availableFunctions.find(
           (fn) => fn.friendly_name === filterByFunction
@@ -244,7 +246,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       const logsStream = new LogsStream(
         environment,
         serviceSid,
-        this.client,
+        this,
         logsConfig
       );
 
@@ -261,7 +263,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         const environmentResource = await getEnvironmentFromSuffix(
           environment,
           serviceSid,
-          this.client
+          this
         );
         environment = environmentResource.sid;
       }
@@ -269,7 +271,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       if (filterByFunction && !isFunctionSid(filterByFunction)) {
         const availableFunctions = await listFunctionResources(
           serviceSid,
-          this.client
+          this
         );
         const foundFunction = availableFunctions.find(
           (fn) => fn.friendly_name === filterByFunction
@@ -280,7 +282,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         filterByFunction = foundFunction.sid;
       }
 
-      return listOnePageLogResources(environment, serviceSid, this.client, {
+      return listOnePageLogResources(environment, serviceSid, this, {
         pageSize: 50,
         functionSid: filterByFunction,
       });
@@ -319,7 +321,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
           const environment = await getEnvironmentFromSuffix(
             targetEnvironment,
             serviceSid,
-            this.client
+            this
           );
           targetEnvironment = environment.sid;
         } catch (err) {
@@ -327,7 +329,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
             const environment = await createEnvironmentFromSuffix(
               targetEnvironment,
               serviceSid,
-              this.client
+              this
             );
             targetEnvironment = environment.sid;
           } else {
@@ -342,13 +344,13 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
           currentEnv = await getEnvironmentFromSuffix(
             sourceEnvironment,
             serviceSid,
-            this.client
+            this
           );
         } else {
           currentEnv = await getEnvironment(
             sourceEnvironment,
             serviceSid,
-            this.client
+            this
           );
         }
         buildSid = currentEnv.build_sid;
@@ -361,9 +363,9 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       const { domain_name } = await getEnvironment(
         targetEnvironment,
         serviceSid,
-        this.client
+        this
       );
-      await activateBuild(buildSid, targetEnvironment, serviceSid, this.client);
+      await activateBuild(buildSid, targetEnvironment, serviceSid, this);
 
       return {
         serviceSid,
@@ -415,11 +417,11 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
           message: 'Creating Service',
         });
         try {
-          serviceSid = await createService(config.serviceName, this.client);
+          serviceSid = await createService(config.serviceName, this);
         } catch (err) {
           const alternativeServiceSid = await findServiceSid(
             config.serviceName,
-            this.client
+            this
           );
           if (!alternativeServiceSid) {
             throw err;
@@ -451,7 +453,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       const environment = await createEnvironmentIfNotExists(
         config.functionsEnv,
         serviceSid,
-        this.client
+        this
       );
       const { sid: environmentSid, domain_name: domain } = environment;
 
@@ -466,7 +468,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       const functionResources = await getOrCreateFunctionResources(
         functions,
         serviceSid,
-        this.client
+        this
       );
 
       this.emit('status-update', {
@@ -475,7 +477,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       });
       const functionVersions = await Promise.all(
         functionResources.map((fn) => {
-          return uploadFunction(fn, serviceSid as string, this.client);
+          return uploadFunction(fn, serviceSid as string, this);
         })
       );
 
@@ -490,7 +492,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       const assetResources = await getOrCreateAssetResources(
         assets,
         serviceSid,
-        this.client
+        this
       );
 
       this.emit('status-update', {
@@ -499,7 +501,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       });
       const assetVersions = await Promise.all(
         assetResources.map((asset) => {
-          return uploadAsset(asset, serviceSid as string, this.client);
+          return uploadAsset(asset, serviceSid as string, this);
         })
       );
 
@@ -511,9 +513,9 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       const build = await triggerBuild(
         { functionVersions, dependencies, assetVersions },
         serviceSid,
-        this.client
+        this
       );
-      await waitForSuccessfulBuild(build.sid, serviceSid, this.client, this);
+      await waitForSuccessfulBuild(build.sid, serviceSid, this);
 
       this.emit('status-update', {
         status: DeployStatus.SETTING_VARIABLES,
@@ -523,14 +525,14 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         config.env,
         environmentSid,
         serviceSid,
-        this.client
+        this
       );
 
       this.emit('status-update', {
         status: DeployStatus.ACTIVATING_DEPLOYMENT,
         message: 'Activating deployment',
       });
-      await activateBuild(build.sid, environmentSid, serviceSid, this.client);
+      await activateBuild(build.sid, environmentSid, serviceSid, this);
 
       this.emit('status', {
         status: DeployStatus.DONE,
@@ -606,6 +608,22 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     } catch (err) {
       convertApiErrorsAndThrow(err);
     }
+  }
+
+  async request(
+    method: HTTPAlias,
+    path: string,
+    options?: OptionsOfJSONResponseBody
+  ) {
+    return this.client[method](path, options);
+  }
+
+  async requestText(
+    method: HTTPAlias,
+    path: string,
+    options?: OptionsOfTextResponseBody
+  ) {
+    return this.client[method](path, options);
   }
 }
 
