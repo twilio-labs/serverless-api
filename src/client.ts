@@ -58,6 +58,10 @@ import {
 } from 'got/dist/source';
 import pLimit, { Limit } from 'p-limit';
 
+const RETRY_DEFAULTS = {
+  limit: 10,
+};
+
 const log = debug('twilio-serverless-api:client');
 
 export function createGotClient(config: ClientConfig): GotClient {
@@ -623,16 +627,18 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
   async request(
     method: HTTPAlias,
     path: string,
-    options?: OptionsOfJSONResponseBody
+    options: OptionsOfJSONResponseBody = {}
   ) {
+    options.retry = RETRY_DEFAULTS;
     return this.limit(() => this.client[method](path, options));
   }
 
   async requestText(
     method: HTTPAlias,
     path: string,
-    options?: OptionsOfTextResponseBody
+    options: OptionsOfTextResponseBody = {}
   ) {
+    options.retry = RETRY_DEFAULTS;
     return this.limit(() => this.client[method](path, options));
   }
 }
