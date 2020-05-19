@@ -56,6 +56,7 @@ import {
   OptionsOfJSONResponseBody,
   OptionsOfTextResponseBody,
 } from 'got/dist/source';
+import pLimit, { Limit } from 'p-limit';
 
 const log = debug('twilio-serverless-api:client');
 
@@ -92,11 +93,20 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
    */
   private client: GotClient;
 
-  constructor(config: ClientConfig) {
+  /**
+   *
+   * @private
+   * @type {Limit}
+   * @memberof TwilioServerlessApiClient
+   */
+  private limit: Limit;
+
+  constructor(config: ClientConfig, concurrency = 50) {
     debug.enable(process.env.DEBUG || '');
     super();
     this.config = config;
     this.client = createGotClient(config);
+    this.limit = pLimit(concurrency);
   }
 
   /**
@@ -615,7 +625,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     path: string,
     options?: OptionsOfJSONResponseBody
   ) {
-    return this.client[method](path, options);
+    return this.limit(() => this.client[method](path, options));
   }
 
   async requestText(
@@ -623,7 +633,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     path: string,
     options?: OptionsOfTextResponseBody
   ) {
-    return this.client[method](path, options);
+    return this.limit(() => this.client[method](path, options));
   }
 }
 
