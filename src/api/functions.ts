@@ -9,6 +9,7 @@ import {
   ServerlessResourceConfig,
   Sid,
   VersionResource,
+  ClientConfig,
 } from '../types';
 import { TwilioServerlessApiClient } from '../client';
 import { getContentType } from '../utils/content-type';
@@ -131,7 +132,8 @@ export async function getOrCreateFunctionResources(
 async function createFunctionVersion(
   fn: FunctionResource,
   serviceSid: string,
-  client: TwilioServerlessApiClient
+  client: TwilioServerlessApiClient,
+  clientConfig: ClientConfig
 ): Promise<VersionResource> {
   try {
     const contentType =
@@ -154,7 +156,7 @@ async function createFunctionVersion(
       `Services/${serviceSid}/Functions/${fn.sid}/Versions`,
       {
         responseType: 'text',
-        prefixUrl: getApiUrl(client.twilioClientConfig, 'serverless-upload'),
+        prefixUrl: getApiUrl(clientConfig, 'serverless-upload'),
         body: form,
       }
     );
@@ -178,9 +180,15 @@ async function createFunctionVersion(
 export async function uploadFunction(
   fn: FunctionResource,
   serviceSid: string,
-  client: TwilioServerlessApiClient
+  client: TwilioServerlessApiClient,
+  clientConfig: ClientConfig
 ): Promise<Sid> {
-  const version = await createFunctionVersion(fn, serviceSid, client);
+  const version = await createFunctionVersion(
+    fn,
+    serviceSid,
+    client,
+    clientConfig
+  );
   return version.sid;
 }
 

@@ -9,6 +9,7 @@ import {
   ServerlessResourceConfig,
   Sid,
   VersionResource,
+  ClientConfig,
 } from '../types';
 import { TwilioServerlessApiClient } from '../client';
 import { getContentType } from '../utils/content-type';
@@ -125,7 +126,8 @@ export async function getOrCreateAssetResources(
 async function createAssetVersion(
   asset: AssetResource,
   serviceSid: string,
-  client: TwilioServerlessApiClient
+  client: TwilioServerlessApiClient,
+  clientConfig: ClientConfig
 ): Promise<VersionResource> {
   try {
     const contentType = await getContentType(
@@ -149,7 +151,7 @@ async function createAssetVersion(
       `Services/${serviceSid}/Assets/${asset.sid}/Versions`,
       {
         responseType: 'text',
-        prefixUrl: getApiUrl(client.twilioClientConfig, 'serverless-upload'),
+        prefixUrl: getApiUrl(clientConfig, 'serverless-upload'),
         body: form,
       }
     );
@@ -173,8 +175,14 @@ async function createAssetVersion(
 export async function uploadAsset(
   asset: AssetResource,
   serviceSid: string,
-  client: TwilioServerlessApiClient
+  client: TwilioServerlessApiClient,
+  clientConfig: ClientConfig
 ): Promise<Sid> {
-  const version = await createAssetVersion(asset, serviceSid, client);
+  const version = await createAssetVersion(
+    asset,
+    serviceSid,
+    client,
+    clientConfig
+  );
   return version.sid;
 }

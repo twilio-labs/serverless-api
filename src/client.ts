@@ -74,7 +74,6 @@ export function createGotClient(config: ClientConfig): GotClient {
       'User-Agent': 'twilio-serverless-api',
     },
   }) as GotClient;
-  client.twilioClientConfig = config;
   return client;
 }
 
@@ -491,7 +490,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       });
       const functionVersions = await Promise.all(
         functionResources.map((fn) => {
-          return uploadFunction(fn, serviceSid as string, this);
+          return uploadFunction(fn, serviceSid as string, this, this.config);
         })
       );
 
@@ -515,7 +514,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
       });
       const assetVersions = await Promise.all(
         assetResources.map((asset) => {
-          return uploadAsset(asset, serviceSid as string, this);
+          return uploadAsset(asset, serviceSid as string, this, this.config);
         })
       );
 
