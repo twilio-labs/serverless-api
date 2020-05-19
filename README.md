@@ -66,7 +66,7 @@ Some functions you might want to check out is:
 
 "Activates" a build by taking a specified build SID or a "source environment" and activating the same build in the specified environment.
 
-[More in the Docs](https://serverless-api.twilio-labs.com/modules/_api_builds_.html#activatebuild)
+[More in the Docs](https://serverless-api.twilio-labs.com/classes/_client_.twilioserverlessapiclient.html#activatebuild)
 
 ### `client.deployLocalProject(deployConfig: DeployLocalProjectConfig): Promise<DeployResult>`
 
