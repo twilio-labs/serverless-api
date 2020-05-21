@@ -28,6 +28,7 @@ import {
 import { listOnePageLogResources } from './api/logs';
 import { createService, findServiceSid, listServices } from './api/services';
 import { getApiUrl } from './api/utils/api-client';
+import { RETRY_LIMIT, CONCURRENCY } from './api/utils/http_config';
 import {
   listVariablesForEnvironment,
   setEnvironmentVariables,
@@ -57,10 +58,6 @@ import {
   OptionsOfTextResponseBody,
 } from 'got/dist/source';
 import pLimit, { Limit } from 'p-limit';
-
-const RETRY_DEFAULTS = {
-  limit: 10,
-};
 
 const log = debug('twilio-serverless-api:client');
 
@@ -104,12 +101,12 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
    */
   private limit: Limit;
 
-  constructor(config: ClientConfig, concurrency = 50) {
+  constructor(config: ClientConfig) {
     debug.enable(process.env.DEBUG || '');
     super();
     this.config = config;
     this.client = createGotClient(config);
-    this.limit = pLimit(concurrency);
+    this.limit = pLimit(config.concurrency || CONCURRENCY);
   }
 
   /**
@@ -628,7 +625,9 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     path: string,
     options: OptionsOfJSONResponseBody = {}
   ) {
-    options.retry = RETRY_DEFAULTS;
+    options.retry = {
+      limit: this.config.retryLimit || RETRY_LIMIT,
+    };
     return this.limit(() => this.client[method](path, options));
   }
 
@@ -637,7 +636,9 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     path: string,
     options: OptionsOfTextResponseBody = {}
   ) {
-    options.retry = RETRY_DEFAULTS;
+    options.retry = {
+      limit: this.config.retryLimit || RETRY_LIMIT,
+    };
     return this.limit(() => this.client[method](path, options));
   }
 }
