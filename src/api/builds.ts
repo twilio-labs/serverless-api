@@ -134,6 +134,7 @@ export function waitForSuccessfulBuild(
   buildSid: string,
   serviceSid: string,
   client: TwilioServerlessApiClient,
+  eventEmitter: events.EventEmitter,
   timeout: number = 5 * 60 * 1000
 ): Promise<void> {
   return new Promise(async (resolve, reject) => {
@@ -142,7 +143,7 @@ export function waitForSuccessfulBuild(
 
     while (!isBuilt) {
       if (Date.now() - startTime > timeout) {
-        client.emit('status-update', {
+        eventEmitter.emit('status-update', {
           status: DeployStatus.TIMED_OUT,
           message: 'Deployment took too long',
         });
@@ -160,7 +161,7 @@ export function waitForSuccessfulBuild(
         return;
       }
 
-      client.emit('status-update', {
+      eventEmitter.emit('status-update', {
         status: DeployStatus.BUILDING,
         message: `Waiting for deployment. Current status: ${status}`,
       });

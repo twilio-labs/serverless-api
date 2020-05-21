@@ -528,7 +528,7 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
         serviceSid,
         this
       );
-      await waitForSuccessfulBuild(build.sid, serviceSid, this);
+      await waitForSuccessfulBuild(build.sid, serviceSid, this, this);
 
       this.emit('status-update', {
         status: DeployStatus.SETTING_VARIABLES,
