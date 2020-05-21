@@ -151,7 +151,7 @@ async function createFunctionVersion(
     form.append('Visibility', fn.access);
     form.append('Content', fn.content, contentOpts);
 
-    const resp = await client.requestText(
+    const resp = await client.request(
       'post',
       `Services/${serviceSid}/Functions/${fn.sid}/Versions`,
       {

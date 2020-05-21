@@ -146,7 +146,7 @@ async function createAssetVersion(
     form.append('Visibility', asset.access);
     form.append('Content', asset.content, contentOpts);
 
-    const resp = await client.requestText(
+    const resp = await client.request(
       'post',
       `Services/${serviceSid}/Assets/${asset.sid}/Versions`,
       {

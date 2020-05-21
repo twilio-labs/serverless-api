@@ -56,6 +56,8 @@ import {
   HTTPAlias,
   OptionsOfJSONResponseBody,
   OptionsOfTextResponseBody,
+  Options,
+  Response,
 } from 'got/dist/source';
 import pLimit, { Limit } from 'p-limit';
 
@@ -620,22 +622,26 @@ export class TwilioServerlessApiClient extends events.EventEmitter {
     }
   }
 
+  // request json without options
+  async request(method: HTTPAlias, path: string): Promise<Response<unknown>>;
+  // request json with options
   async request(
     method: HTTPAlias,
     path: string,
-    options: OptionsOfJSONResponseBody = {}
-  ) {
-    options.retry = {
-      limit: this.config.retryLimit || RETRY_LIMIT,
-    };
-    return this.limit(() => this.client[method](path, options));
-  }
-
-  async requestText(
+    options: OptionsOfJSONResponseBody
+  ): Promise<Response<unknown>>;
+  // request text
+  async request(
     method: HTTPAlias,
     path: string,
-    options: OptionsOfTextResponseBody = {}
-  ) {
+    options: OptionsOfTextResponseBody
+  ): Promise<Response<string>>;
+  // general implementation
+  async request(
+    method: HTTPAlias,
+    path: string,
+    options: Options = {}
+  ): Promise<unknown> {
     options.retry = {
       limit: this.config.retryLimit || RETRY_LIMIT,
     };
