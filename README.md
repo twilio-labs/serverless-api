@@ -183,6 +183,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.stefanjudis.com/"><img src="https://avatars3.githubusercontent.com/u/962099?v=4" width="100px;" alt=""/><br /><sub><b>Stefan Judis</b></sub></a><br /><a href="https://github.com/twilio-labs/serverless-api/commits?author=stefanjudis" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/vernig"><img src="https://avatars0.githubusercontent.com/u/54728384?v=4" width="100px;" alt=""/><br /><sub><b>G Verni</b></sub></a><br /><a href="https://github.com/twilio-labs/serverless-api/commits?author=vernig" title="Documentation">📖</a></td>
     <td align="center"><a href="http://linkedin.com/in/butuzov"><img src="https://avatars1.githubusercontent.com/u/651824?v=4" width="100px;" alt=""/><br /><sub><b>Oleg Butuzov</b></sub></a><br /><a href="https://github.com/twilio-labs/serverless-api/commits?author=butuzov" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://stevenbock.me"><img src="https://avatars3.githubusercontent.com/u/2431938?v=4" width="100px;" alt=""/><br /><sub><b>Steven Bock</b></sub></a><br /><a href="https://github.com/twilio-labs/serverless-api/commits?author=dabockster" title="Code">💻</a></td>
   </tr>
 </table>
 

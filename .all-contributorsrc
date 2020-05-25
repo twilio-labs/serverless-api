@@ -47,6 +47,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "dabockster",
+      "name": "Steven Bock",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/2431938?v=4",
+      "profile": "http://stevenbock.me",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
