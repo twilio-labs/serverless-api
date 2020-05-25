@@ -29,6 +29,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vernig",
+      "name": "G Verni",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/54728384?v=4",
+      "profile": "https://github.com/vernig",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
