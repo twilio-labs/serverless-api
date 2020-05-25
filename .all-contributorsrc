@@ -38,6 +38,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "butuzov",
+      "name": "Oleg Butuzov",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/651824?v=4",
+      "profile": "http://linkedin.com/in/butuzov",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
