@@ -1,7 +1,7 @@
 /** @module @twilio-labs/serverless-api/dist/api */
 
 import debug from 'debug';
-import { EnvironmentList, EnvironmentResource, GotClient, Sid } from '../types';
+import { EnvironmentList, EnvironmentResource, Sid } from '../types';
 import { getPaginatedResource } from './utils/pagination';
 import { ClientApiError } from '../utils/error';
 import { TwilioServerlessApiClient } from '../client';
