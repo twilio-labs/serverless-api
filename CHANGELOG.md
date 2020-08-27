@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.2](https://github.com/twilio-labs/serverless-api/compare/v4.0.1...v4.0.2) (2020-08-27)
+
+
+### Bug Fixes
+
+* add 429 handling from twilio-labs/serverless-toolkit[#178](https://github.com/twilio-labs/serverless-api/issues/178) ([449fda2](https://github.com/twilio-labs/serverless-api/commit/449fda27dedaa6331ad73ee45bfd477c3c2149bf))
+
 ### [4.0.1](https://github.com/twilio-labs/serverless-api/compare/v4.0.0...v4.0.1) (2020-07-28)
 
 
