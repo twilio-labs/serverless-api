@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/twilio-labs/serverless-api/compare/v4.0.3...v4.1.0) (2021-02-17)
+
+
+### Features
+
+* **runtime:** adds runtime parameter to config ([c92ebcb](https://github.com/twilio-labs/serverless-api/commit/c92ebcb1ac2e226247080e9a9bf1ee814595461e))
+
 ### [4.0.3](https://github.com/twilio-labs/serverless-api/compare/v4.0.2...v4.0.3) (2020-10-29)
 
 
