@@ -2,8 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [4.1.0](https://github.com/twilio-labs/serverless-api/compare/v4.0.3...v4.1.0) (2021-02-17)
+## [4.1.1](https://github.com/twilio-labs/serverless-api/compare/v4.1.0...v4.1.1) (2021-03-31)
 
+### Bug Fixes
+
+* **pagination:** `got` changed behaviour around setting a `prefixUrl` to `undefined` leading to our pagination requests 404ing because the request URL looked like `https://serverless.twilio.com/v1/https://serverless.twilio.com/v1/PATH`. Setting `prefixUrl` to `""` fixes this.
+
+## [4.1.0](https://github.com/twilio-labs/serverless-api/compare/v4.0.3...v4.1.0) (2021-02-17)
 
 ### Features
 
