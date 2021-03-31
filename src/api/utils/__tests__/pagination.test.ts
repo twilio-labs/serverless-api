@@ -92,6 +92,10 @@ describe('pagination', () => {
     );
 
     expect(client.request).toHaveBeenCalledTimes(5);
+    expect(client.request).toHaveBeenCalledWith('get', '/Services', {
+      prefixUrl: '',
+      responseType: 'json',
+    });
     expect(results.length).toBe(5);
     expect(results[0].sid).toBe('ZS0');
     expect(results[1].sid).toBe('ZS1');
